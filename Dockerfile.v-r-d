@@ -14,6 +14,7 @@ RUN wget -q https://launchpad.net/linaro-toolchain-binaries/trunk/${LINARO_GCC_R
 FROM ${BASE_IMAGE}
 
 USER root
+RUN apt-get update && apt-get install -y lib32z1 lib32stdc++6 && rm -fr /var/lib/apt/lists/*
 COPY --from=download /opt/linaro/ /opt/linaro/
 USER user
 ENV PATH ${PATH}:/opt/linaro/bin
