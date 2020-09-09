@@ -1,0 +1,19 @@
+ARG BASE_IMAGE
+FROM alpine:edge AS download
+
+ARG LINARO_GCC_VERSION=4.7
+ARG LINARO_GCC_RELEASE=2013.03
+ARG LINARO_GCC_DATE=20130313
+WORKDIR /
+RUN apk add --no-cache tar wget
+RUN wget -q -O- https://launchpad.net/linaro-toolchain-binaries/trunk/${LINARO_GCC_RELEASE}/+download/gcc-linaro-arm-linux-gnueabihf-${LINARO_GCC_VERSION}-${LINARO_GCC_RELEASE}-${LINARO_GCC_DATE}_linux.tar.bz2 | tar xjf -
+WORKDIR /opt/linaro
+RUN cp -R /gcc-linaro-arm-linux-gnueabihf-${LINARO_GCC_VERSION}-${LINARO_GCC_RELEASE}-${LINARO_GCC_DATE}_linux/* /opt/linaro/
+RUN wget -q https://launchpad.net/linaro-toolchain-binaries/trunk/${LINARO_GCC_RELEASE}/+download/gcc-linaro-arm-linux-gnueabihf-${LINARO_GCC_VERSION}-${LINARO_GCC_RELEASE}-${LINARO_GCC_DATE}_src.tar.bz2 || true
+
+FROM ${BASE_IMAGE}
+
+USER root
+COPY --from=download /opt/linaro/ /opt/linaro/
+USER user
+ENV PATH ${PATH}:/opt/linaro/bin
